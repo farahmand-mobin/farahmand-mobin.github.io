@@ -1,3 +1,8 @@
-<?php
-echo "I am PHP developer!";
-?>
+<!DOCTYPE html>
+<html>
+  <head>
+  </head>
+  <body>
+    Hello
+  </body>
+</html>
