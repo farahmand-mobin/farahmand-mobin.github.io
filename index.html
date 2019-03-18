@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebRTC</title>
+  </head>
+  <body>
+    <video id="live" controls></video>
+    <br>
+    <video id="record" controls></video>
+    <br>
+    <button type="button" id="start">Start</button>
+    <button type="button" id="stop">Stop</button>
+    <script>
+    let constraintObj = {
+      audio: false,
+      video: {
+        facingMode: 'user',
+        width: {
+          min: 640,
+          ideal: 1280,
+          max: 1920
+        },
+        height: {
+          min: 480,
+          ideal: 720,
+          max: 1080
+        }
+      }
+    };
+    navigator.mediaDevices.getUserMedia(constraintObj)
+    .then(
+      function (mediaStreamObj) {
+        let video = document.getElementById('live');
+        if ('srcObject' in video) {
+          video.srcObject = mediaStreamObj;
+        } else {
+          video.src = window.URL.createObjectURL(mediaStreamObj);
+        }
+
+        video.onloadedmetadata = function (e) {
+          video.play();
+        }
+
+        let start  = document.getElementById('start');
+        let stop   = document.getElementById('stop');
+        let record = document.getElementById('record');
+        let chunks = [];
+        let mediaRecorder = new mediaRecorder(mediaStreamObj);
+
+        start.addEventListener('click', (e) => {
+          mediaRecorder.start();
+          console.log(mediaRecorder.state);
+        });
+        stop.addEventListener('click', (e) => {
+          mediaRecorder.stop();
+          console.log(mediaRecorder.state);
+        });
+        mediaRecorder.ondataavailable = function (e) {
+          chunks.push(e.data);
+        }
+        mediaRecorder.onstop = function (e) {
+          let blob = new Blob(chunks,{type:'video/mp4;'});
+          chunks = [];
+          let videoURL = window.URL.createObjectURL(blob);
+          record.src = videoURL;
+        }
+    })
+    .catch(function (error) {
+      console.error(error.name,error.message);
+    })
+    console.error('error.name','error.message');
+    </script>
+  </body>
+</html>
