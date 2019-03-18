@@ -37,7 +37,7 @@
           return Promise.reject(new Error('getUserMedia error method.'))
         }
         return new Promise(function (resolve,reject) {
-          getUserMedia.call(navigator,constraints,resolve,reject);
+          getUserMedia.call(navigator,constraintObj,resolve,reject);
         });
       }
     } else {
