@@ -29,6 +29,28 @@
         }
       }
     };
+    if (navigator.mediaDevices === undefined) {
+      navigator.mediaDevices = {};
+      navigator.mediaDevices.getUserMedia = function (constraints) {
+        let getUserMedia = navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
+        if (!getUserMedia) {
+          return Promise.reject(new Error('getUserMedia error method.'))
+        }
+        return new Promise(function (resolve,reject) {
+          getUserMedia.call(navigator,constraints,resolve,reject);
+        });
+      }
+    } else {
+      navigator.mediaDevices.enumerateDevices()
+      .then(devices => {
+        devices.forEach(device => {
+          console.log(device.kind.toUpperCase(), device.label);
+        })
+      })
+      .catch(function (error) {
+        console.error(error.name,error.message);
+      })
+    }
     navigator.mediaDevices.getUserMedia(constraintObj)
     .then(
       function (mediaStreamObj) {
@@ -59,7 +81,6 @@
         });
         mediaRecorder.ondataavailable = function (e) {
           chunks.push(e.data);
-          alert(e.data);
         }
         mediaRecorder.onstop = function (e) {
           let blob = new Blob(chunks,{type:'video/mp4;'});
