@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>GET USER MEDIA!</title>
+    <script src="cdn.webrtc-experiment.com/MediaStreamRecorder.js"></script>
+    <script src="cdn.webrtc-experiment.com/gif-recorder.js"></script>
   </head>
   <body>
     <button onclick="getStream('audio')">Audio</button><br/>
@@ -29,14 +31,22 @@
       constraints[type] = true;
       getUserMedia(constraints, 
       function(stream) {
-        let mediaControl = (type == 'audio') ? document.getElementById('userAudio') : document.getElementById('userVideo');
+        let mediaControl = (type == 'audio') ? document.getElementById('userAudio') : document.getElementById('useVideo');
         
         if ('srcObject' in mediaControl) {
           mediaControl.srcObject = stream;
           mediaControl.src = (window.URL || window.webkitURL).createObjectURL(stream);
         } else if (navigator.mozGetUserMedia) {
-          mediaControl.mozSrcObject = stream;
+          diaControl.mozSrcObject = stream;
         }
+        let mediaRecorder = new MediaStreamRecorder(stream);
+        mediaRecorder.mimeType = (type == 'audio') ? 'audio/webm': 'image/gif';
+        mediaRecorder.ondataavailable = function (blob) {
+          // POST/PUT "Blob" using FormData/XHR2
+          let blobURL = URL.createObjectURL(blob);
+          document.write('<a href="' + blobURL + '">' + blobURL + '</a>');
+        };
+        mediaRecorder.start(3000);
       }, 
       function (err) {
         console.error('Error: ' + err);
