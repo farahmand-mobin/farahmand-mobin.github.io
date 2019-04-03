@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>GET USER MEDIA!</title>
+  </head>
+  <body>
+    <button onclick="getStream('audio')">Audio</button><br/>
+    <audio id="userAudio" controls autoplay></audio><br/>
+    <button onclick="getStream('video')">Video</button><br/>
+    <video id="userVideo" controls autoplay style="height:180px; width: 240px;"></video>
+    <script>
+    let userMediaState = (!navigator.getUserMedia && !navigator.webkitGetUserMedia && !navigator.mozGetUserMedia && !navigator.msGetUserMedia) ? false : true;
+    function getUserMedia(options, successCallback, failureCallback) {
+      let userMediaAPI = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia;
+      if (userMediaAPI) {
+        return userMediaAPI.bind(navigator)(options, successCallback, failureCallback);
+      }
+    }
+
+    function getStream(type) {
+      if (!userMediaState) {
+        return false;
+      }
+
+      let constraints = {};
+      constraints[type] = true;
+      getUserMedia(constraints, 
+      function(stream) {
+        let mediaControl = (type == 'audio') ? document.getElementById('userAudio') : document.getElementById('userVideo');
+        
+        if ('srcObject' in mediaControl) {
+          mediaControl.srcObject = stream;
+          mediaControl.src = (window.URL || window.webkitURL).createObjectURL(stream);
+        } else if (navigator.mozGetUserMedia) {
+          mediaControl.mozSrcObject = stream;
+        }
+      }, 
+      function (err) {
+        console.error('Error: ' + err);
+      });
+    }
+    </script>
+  </body>
+</html>
